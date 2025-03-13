@@ -9,7 +9,7 @@ pipeline {
         stage('Clean Workspace') {
             steps {
                 script {
-                    sh 'rm -rf ${WORKSPACE}/*'
+                    sh 'find ${WORKSPACE} -mindepth 1 ! -name "train_failure_model.py" ! -name "predict_failure.py" ! -name "visualize_results.py" -delete'
                 }
             }
         }
@@ -56,7 +56,12 @@ pipeline {
         stage('Visualize Results') {
             steps {
                 script {
-                    sh '. ${VENV}/bin/activate && python visualize_results.py'
+                    try {
+                        sh '. ${VENV}/bin/activate && python visualize_results.py'
+                    } catch (Exception e) {
+                        echo 'Visualization failed!'
+                        currentBuild.result = 'FAILURE'
+                    }
                 }
             }
         }
