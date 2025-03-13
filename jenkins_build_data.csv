@@ -1,6 +1,6 @@
 build_number,build_time_seconds,tests_failed,total_tests,result
 1,120,2,100,FAILURE
 2,95,0,100,SUCCESS
-3,200,5,100,FAILURE
+3,200,5,100,SUCCESS
 4,85,0,100,SUCCESS
 5,300,10,100,FAILURE
