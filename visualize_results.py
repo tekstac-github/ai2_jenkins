@@ -1,35 +1,29 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import joblib
 
-# Load the data
+# Load data
 data = pd.read_csv('jenkins_build_data.csv')
 
-# Debugging: Print actual columns in the data
-print(f"CSV Columns: {data.columns}")
+# Load the trained model
+model = joblib.load('failure_prediction_model.pkl')
 
-# Check if the expected columns are present
-required_columns = {'build_number', 'build_time_seconds', 'tests_failed', 'total_tests', 'result'}
-if not required_columns.issubset(data.columns):
-    missing_columns = required_columns - set(data.columns)
-    print(f"Error: Required columns not found in data: {missing_columns}")
-    exit(1)
+# Features
+X = data[['build_time_seconds', 'tests_failed', 'total_tests']]
 
-# Visualize build time distribution
-sns.histplot(data['build_time_seconds'], bins=30, kde=True)
-plt.title('Build Time Distribution')
-plt.xlabel('Build Time (seconds)')
-plt.ylabel('Frequency')
-plt.show()
+# Get predictions
+data['predicted_result'] = model.predict(X)
 
-# Visualize tests failed vs total tests
-plt.scatter(data['total_tests'], data['tests_failed'], alpha=0.5)
-plt.title('Tests Failed vs Total Tests')
-plt.xlabel('Total Tests')
-plt.ylabel('Tests Failed')
-plt.show()
+# Visualize actual vs. predicted results
+plt.figure(figsize=(8, 6))
+sns.countplot(x='result', data=data, label='Actual', alpha=0.7)
+sns.countplot(x='predicted_result', data=data, label='Predicted', alpha=0.5)
+plt.legend()
+plt.title('Actual vs Predicted Build Results')
+plt.xlabel('Build Result (0=SUCCESS, 1=FAILURE)')
+plt.ylabel('Count')
 
-# Visualize build results
-sns.countplot(x='result', data=data)
-plt.title('Build Results Count')
-plt.show()
+# Save the plot
+plt.savefig('build_results_comparison.png')
+print('Visualization saved as build_results_comparison.png')
