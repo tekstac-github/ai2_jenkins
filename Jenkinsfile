@@ -9,7 +9,7 @@ pipeline {
         stage('Clean Workspace') {
             steps {
                 script {
-                    sh 'find ${WORKSPACE} -mindepth 1 ! -name "train_failure_model.py" ! -name "predict_failure.py" ! -name "visualize_results.py" -delete'
+                    sh 'find ${WORKSPACE} -mindepth 1 ! -name "train_failure_model.py" ! -name "predict_failure.py" ! -name "visualize_results.py" ! -name "jenkins_build_data.csv" -delete'
                 }
             }
         }
@@ -29,6 +29,9 @@ pipeline {
             steps {
                 script {
                     try {
+                        if (!fileExists('jenkins_build_data.csv')) {
+                            error 'Training data file not found: jenkins_build_data.csv'
+                        }
                         sh '. ${VENV}/bin/activate && python train_failure_model.py'
                     } catch (Exception e) {
                         echo 'Model training failed!'
@@ -43,6 +46,9 @@ pipeline {
                 script {
                     def prediction = ''
                     try {
+                        if (!fileExists('failure_prediction_model.pkl')) {
+                            error 'Model file not found: failure_prediction_model.pkl'
+                        }
                         prediction = sh(script: '. ${VENV}/bin/activate && python predict_failure.py', returnStdout: true).trim()
                         echo "AI Prediction: ${prediction}"
                     } catch (Exception e) {
