@@ -63,7 +63,11 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh '. ${VENV}/bin/activate && python visualize_results.py'
+                        if (fileExists('visualize_results.py')) {
+                            sh '. ${VENV}/bin/activate && python visualize_results.py'
+                        } else {
+                            echo 'Visualization script not found, skipping visualization.'
+                        }
                     } catch (Exception e) {
                         echo 'Visualization failed!'
                         currentBuild.result = 'FAILURE'
@@ -82,7 +86,7 @@ pipeline {
         }
         always {
             archiveArtifacts artifacts: 'failure_prediction_model.pkl', onlyIfSuccessful: true
-            sh 'deactivate'
+            sh '[ -n "$VIRTUAL_ENV" ] && deactivate || true'
         }
     }
 }
