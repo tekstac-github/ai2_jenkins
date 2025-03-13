@@ -65,6 +65,10 @@ pipeline {
                     try {
                         if (fileExists('visualize_results.py')) {
                             sh '. ${VENV}/bin/activate && python visualize_results.py'
+                            // Archive the graph so it’s accessible in Jenkins
+                            archiveArtifacts artifacts: 'build_results_comparison.png', onlyIfSuccessful: true
+                            echo 'Visualization complete! View the graph here:'
+                            echo "${env.BUILD_URL}artifact/build_results_comparison.png"
                         } else {
                             echo 'Visualization script not found, skipping visualization.'
                         }
