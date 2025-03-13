@@ -5,11 +5,10 @@ pipeline {
         stage('Set Up Environment') {
             steps {
                 script {
-                    sh 'sudo apt install python3-virtualenv'
-                    sh 'pip install virtualenv'
+                    sh 'sudo apt install -y python3-virtualenv'
                     sh 'virtualenv jenkins-ai-env'
-                    sh '. jenkins-ai-env/bin/activate'
-                    sh 'pip install pandas scikit-learn numpy joblib'
+                    sh '. jenkins-ai-env/bin/activate && pip install --upgrade pip'
+                    sh '. jenkins-ai-env/bin/activate && pip install pandas scikit-learn numpy joblib'
                 }
             }
         }
