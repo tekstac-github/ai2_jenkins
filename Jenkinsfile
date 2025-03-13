@@ -8,7 +8,7 @@ pipeline {
                     sh 'sudo apt install python3-virtualenv'
                     sh 'pip install virtualenv'
                     sh 'virtualenv jenkins-ai-env'
-                    sh 'source jenkins-ai-env/bin/activate'
+                    sh '. jenkins-ai-env/bin/activate'
                     sh 'pip install pandas scikit-learn numpy joblib'
                 }
             }
@@ -17,7 +17,7 @@ pipeline {
         stage('Train AI Model') {
             steps {
                 script {
-                    sh 'source jenkins-ai-env/bin/activate && python train_failure_model.py'
+                    sh '. jenkins-ai-env/bin/activate && python train_failure_model.py'
                 }
             }
         }
@@ -25,7 +25,7 @@ pipeline {
         stage('Predict Failure') {
             steps {
                 script {
-                    def prediction = sh(script: 'source jenkins-ai-env/bin/activate && python predict_failure.py', returnStdout: true).trim()
+                    def prediction = sh(script: '. jenkins-ai-env/bin/activate && python predict_failure.py', returnStdout: true).trim()
                     echo "AI Prediction: ${prediction}"
                 }
             }
@@ -38,4 +38,3 @@ pipeline {
         }
     }
 }
-
